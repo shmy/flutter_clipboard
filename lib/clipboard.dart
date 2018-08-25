@@ -11,4 +11,8 @@ class ClipboardManager {
       "content": content
     });
   }
+  static Future<String> read() async {
+    String s = await _channel.invokeMethod('read');
+    return Future.value(s);
+  }
 }

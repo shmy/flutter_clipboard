@@ -3,6 +3,8 @@ package tech.shmy.clipboard.clipboard;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.ClipboardManager;
+import android.util.Log;
+
 import static android.content.Context.CLIPBOARD_SERVICE;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -27,11 +29,27 @@ public class ClipboardPlugin implements MethodCallHandler {
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-    String content = call.argument("content").toString();
     if (call.method.equals("copy")) {
+      String content = call.argument("content").toString();
       // 拷贝到剪贴板
       ClipData myClip = ClipData.newPlainText("text", content);//text是内容
       this.myClipboard.setPrimaryClip(myClip);
+    } else if (call.method.equals("read")) {
+
+      if(!this.myClipboard.hasPrimaryClip()) {
+        result.success(null);
+        return;
+      }
+      try {
+        ClipData myClip = this.myClipboard.getPrimaryClip();
+
+        String text = myClip.getItemAt(0).getText().toString();;
+
+        result.success(text);
+      }catch (Exception e) {
+        e.printStackTrace();
+        result.success(null);
+      }
     } else {
       result.notImplemented();
     }
